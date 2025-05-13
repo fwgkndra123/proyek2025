@@ -40,36 +40,36 @@
         return mysqli_affected_rows($config);
     }
 
-    function login($data) {
-        global $config;
-        $email = mysqli_real_escape_string($config, htmlspecialchars($_POST["email"]));
-        $password = htmlspecialchars($_POST["password"]);
+function login($data) {
+    global $config;
+    $email = mysqli_real_escape_string($config, htmlspecialchars($data["email"]));
+    $password = htmlspecialchars($data["password"]);
 
-        $result = mysqli_query($config, "SELECT * FROM tb_users WHERE email = '$email'");
+    $result = mysqli_query($config, "SELECT * FROM tb_users WHERE email = '$email'");
 
-        if(mysqli_num_rows($result) == 1 ) {
-            $row = mysqli_fetch_assoc($result);
-            if(password_verify($password, $row["password"])) {
-                if($row["id_level"] == 2) {
-                    session_start();
-                    $_SESSION["email"] = $row["email"];
-                    $_SESSION["nama"] = $row["nama"];
-                    $_SESSION["id"] = $row["id"];
-                    $_SESSION["password"] = $row["password"];
-                    header("Location: home.php");
-                    exit;
-                } else if($row["id_level"] == 1) {
-                    session_start();
-                    $_SESSION["nama"] = $row["nama"];
-                    $_SESSION["email"] = $row["email"];
-                    $_SESSION["id"] = $row["id"];
-                    $_SESSION["password"] = $row["password"];
-                    header("Location: admin/admin.php");
-                    exit;
-                }
-            } 
+    if(mysqli_num_rows($result) == 1 ) {
+        $row = mysqli_fetch_assoc($result);
+        if(password_verify($password, $row["password"])) {
+            session_start();
+            $_SESSION["email"] = $row["email"];
+            $_SESSION["nama"] = $row["nama"];
+            $_SESSION["id"] = $row["id"];
+            $_SESSION["password"] = $row["password"];
+
+            if($row["id_level"] == 2) {
+                header("Location: home.php");
+                exit;
+            } else if($row["id_level"] == 1) {
+                header("Location: admin/admin.php");
+                exit;
+            }
+            return 1;
         }
     }
+
+    return 0; // Tambahkan ini agar if di index.php bisa membedakan gagal dan berhasil
+}
+
 
     function addKegiatan($data) {
         global $config;
